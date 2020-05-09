@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        
+
     }
 
 
@@ -173,6 +173,8 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+
+    boolean vibrate=true;
     public void onClick(View v){
         detector.setProcessor(new Detector.Processor<Barcode>() {
             @Override
@@ -184,10 +186,13 @@ public class MainActivity extends AppCompatActivity {
             public void receiveDetections(Detector.Detections<Barcode> detections) {
                 final SparseArray <Barcode> barcodes = detections.getDetectedItems();
                 if(barcodes.size()!=0){
-                    if (Build.VERSION.SDK_INT >= 26) {
-                        ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
-                    } else {
-                        ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(150);
+                    if(vibrate==true) {
+                        if (Build.VERSION.SDK_INT >= 26) {
+                            ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
+                        } else {
+                            ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(150);
+                        }
+                        vibrate=false;
                     }
 
 
