@@ -10,12 +10,16 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.vision.CameraSource;
+import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 
@@ -31,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private CameraSource cameraSource;
     private SurfaceView surfaceView;
     private BarcodeDetector detector;
+    private TextView tv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         detector = new BarcodeDetector.Builder(getApplicationContext())
                 .setBarcodeFormats(Barcode.QR_CODE).build();
         surfaceView = findViewById(R.id.surfaceView);
+        tv = findViewById(R.id.tv);
         if (!detector.isOperational()) {
             Log.d("tag111", "onCreate: Detector Initialisation failed ");
         }
@@ -50,6 +56,33 @@ public class MainActivity extends AppCompatActivity {
 
             setupSurfaceHolder();
         }
+
+        Button btn = findViewById(R.id.btn);
+        btn.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v){
+                Log.d("mytagmyrules", "onClick: heya bro wassup");
+            }
+        });
+
+        detector.setProcessor(new Detector.Processor<Barcode>() {
+            @Override
+            public void release() {
+
+            }
+
+            @Override
+            public void receiveDetections(Detector.Detections<Barcode> detections) {
+                final SparseArray <Barcode> barcodes = detections.getDetectedItems();
+                if(barcodes.size()!=0){
+                    tv.post(new Runnable(){
+                        public void run() {
+                            tv.setText(barcodes.valueAt(0).displayValue);
+                        }
+                    });
+                }
+            }
+        });
 
     }
 
@@ -155,9 +188,4 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-
-
-
-    //All the above stuff was to check if appropriate permissions have been granted
-
     }
