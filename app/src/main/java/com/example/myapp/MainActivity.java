@@ -6,9 +6,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
@@ -57,33 +61,13 @@ public class MainActivity extends AppCompatActivity {
             setupSurfaceHolder();
         }
 
-        Button btn = findViewById(R.id.btn);
-        btn.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View v){
-                Log.d("mytagmyrules", "onClick: heya bro wassup");
-            }
-        });
 
-        detector.setProcessor(new Detector.Processor<Barcode>() {
-            @Override
-            public void release() {
 
-            }
 
-            @Override
-            public void receiveDetections(Detector.Detections<Barcode> detections) {
-                final SparseArray <Barcode> barcodes = detections.getDetectedItems();
-                if(barcodes.size()!=0){
-                    tv.post(new Runnable(){
-                        public void run() {
-                            tv.setText(barcodes.valueAt(0).displayValue);
-                        }
-                    });
-                }
-            }
-        });
 
+
+
+        
     }
 
 
@@ -188,4 +172,33 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
+
+    public void onClick(View v){
+        detector.setProcessor(new Detector.Processor<Barcode>() {
+            @Override
+            public void release() {
+
+            }
+
+            @Override
+            public void receiveDetections(Detector.Detections<Barcode> detections) {
+                final SparseArray <Barcode> barcodes = detections.getDetectedItems();
+                if(barcodes.size()!=0){
+                    if (Build.VERSION.SDK_INT >= 26) {
+                        ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(VibrationEffect.createOneShot(150, VibrationEffect.DEFAULT_AMPLITUDE));
+                    } else {
+                        ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(150);
+                    }
+
+
+                    tv.post(new Runnable(){
+                        public void run() {
+                            tv.setText(barcodes.valueAt(0).displayValue);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
     }
